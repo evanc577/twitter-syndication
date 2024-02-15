@@ -27,7 +27,6 @@ pub struct User {
     pub screen_name: String,
     pub verified: bool,
     pub is_blue_verified: bool,
-    pub profile_image_shape: String,
 }
 
 #[derive(Deserialize, Serialize, Clone, Hash, Debug)]
