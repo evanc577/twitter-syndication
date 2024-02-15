@@ -6,7 +6,6 @@ pub struct Tweet {
     pub conversation_count: u64,
     pub favorite_count: u64,
     pub id_str: String,
-    pub possibly_sensitive: bool,
     pub text: String,
     #[serde(rename = "isEdited")]
     pub is_edited: bool,
