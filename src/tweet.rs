@@ -4,6 +4,7 @@ use serde::{Deserialize, Serialize};
 pub struct Tweet {
     pub lang: String,
     pub conversation_count: u64,
+    pub created_at: String,
     pub favorite_count: u64,
     pub id_str: String,
     pub text: String,
