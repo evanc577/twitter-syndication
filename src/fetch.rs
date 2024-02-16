@@ -78,4 +78,11 @@ mod tests {
         assert_eq!(0, tweet.photos.len());
         assert!(tweet.video.is_some());
     }
+
+    #[tokio::test]
+    async fn problematic() {
+        let tweet_fetcher = TweetFetcher::new().unwrap();
+        let tweet_id: u64 = 1733455117977112615;
+        let tweet = tweet_fetcher.fetch(tweet_id).await.unwrap();
+    }
 }
