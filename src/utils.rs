@@ -46,5 +46,6 @@ mod tests {
         assert_eq!(calc_token(1079631553641164802), "2m7rg9vs6bh");
         assert_eq!(calc_token(1753365478318416281), "49cyp3d8ng");
         assert_eq!(calc_token(1727250580131750107), "46qbfs66quq");
+        assert_eq!(calc_token(1757965341978956071), "49et726opy");
     }
 }

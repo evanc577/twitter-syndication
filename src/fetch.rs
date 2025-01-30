@@ -1,3 +1,5 @@
+use std::time::Duration;
+
 use once_cell::sync::Lazy;
 use reqwest::{header, Client};
 use url::Url;
@@ -19,7 +21,10 @@ impl TweetFetcher {
                 "Mozilla/5.0 (X11; Linux x86_64; rv:122.0) Gecko/20100101 Firefox/122.0",
             ),
         );
-        let client = Client::builder().default_headers(headers).build()?;
+        let client = Client::builder()
+            .timeout(Duration::from_secs(10))
+            .default_headers(headers)
+            .build()?;
         Ok(Self { client })
     }
 
