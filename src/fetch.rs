@@ -4,7 +4,7 @@ use once_cell::sync::Lazy;
 use reqwest::{header, Client};
 use url::Url;
 
-use crate::tweet::Tweet;
+use crate::tweet::{Tweet, TweetType};
 use crate::utils::calc_token;
 
 pub struct TweetFetcher {
@@ -19,7 +19,7 @@ impl TweetFetcher {
         Ok(Self { client })
     }
 
-    pub async fn fetch(&self, tweet_id: u64) -> Result<Tweet, reqwest::Error> {
+    pub async fn fetch(&self, tweet_id: u64) -> Result<Option<Tweet>, reqwest::Error> {
         static ENDPOINT: Lazy<Url> =
             Lazy::new(|| Url::parse("https://cdn.syndication.twimg.com/tweet-result").unwrap());
         let mut url = ENDPOINT.clone();
@@ -38,7 +38,7 @@ impl TweetFetcher {
             ),
         );
 
-        let tweet: Tweet = self
+        let tweet_type: TweetType = self
             .client
             .get(url)
             .headers(headers)
@@ -47,7 +47,11 @@ impl TweetFetcher {
             .error_for_status()?
             .json()
             .await?;
-        Ok(tweet)
+
+        match tweet_type {
+            TweetType::Tweet(tweet) => Ok(Some(tweet)),
+            TweetType::TweetTombstone => Ok(None),
+        }
     }
 }
 
@@ -59,7 +63,7 @@ mod tests {
     async fn photos() {
         let tweet_fetcher = TweetFetcher::new().unwrap();
         let tweet_id: u64 = 1079631553641164802;
-        let tweet = tweet_fetcher.fetch(tweet_id).await.unwrap();
+        let tweet = tweet_fetcher.fetch(tweet_id).await.unwrap().unwrap();
         assert!(!tweet.text.is_empty());
         assert_eq!(tweet_id.to_string(), tweet.id_str);
         assert_eq!(3, tweet.photos.len());
@@ -70,7 +74,7 @@ mod tests {
     async fn youtube_live_link() {
         let tweet_fetcher = TweetFetcher::new().unwrap();
         let tweet_id: u64 = 1753365478318416281;
-        let tweet = tweet_fetcher.fetch(tweet_id).await.unwrap();
+        let tweet = tweet_fetcher.fetch(tweet_id).await.unwrap().unwrap();
         assert!(!tweet.text.is_empty());
         assert_eq!(tweet_id.to_string(), tweet.id_str);
         assert_eq!(0, tweet.photos.len());
@@ -81,7 +85,7 @@ mod tests {
     async fn video() {
         let tweet_fetcher = TweetFetcher::new().unwrap();
         let tweet_id: u64 = 1727250580131750107;
-        let tweet = tweet_fetcher.fetch(tweet_id).await.unwrap();
+        let tweet = tweet_fetcher.fetch(tweet_id).await.unwrap().unwrap();
         assert!(!tweet.text.is_empty());
         assert_eq!(tweet_id.to_string(), tweet.id_str);
         assert_eq!(0, tweet.photos.len());
@@ -92,6 +96,14 @@ mod tests {
     async fn problematic() {
         let tweet_fetcher = TweetFetcher::new().unwrap();
         let tweet_id: u64 = 1733455117977112615;
+        let tweet = tweet_fetcher.fetch(tweet_id).await.unwrap().unwrap();
+    }
+
+    #[tokio::test]
+    async fn tombstone() {
+        let tweet_fetcher = TweetFetcher::new().unwrap();
+        let tweet_id: u64 = 1878683993618718993;
         let tweet = tweet_fetcher.fetch(tweet_id).await.unwrap();
+        assert!(tweet.is_none());
     }
 }

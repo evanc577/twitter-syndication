@@ -1,5 +1,13 @@
 use serde::{Deserialize, Serialize};
 
+#[allow(clippy::large_enum_variant)]
+#[derive(Deserialize, Serialize, Clone, Hash, Debug)]
+#[serde(tag = "__typename")]
+pub(crate) enum TweetType {
+    Tweet(Tweet),
+    TweetTombstone,
+}
+
 #[derive(Deserialize, Serialize, Clone, Hash, Debug)]
 pub struct Tweet {
     pub lang: String,
