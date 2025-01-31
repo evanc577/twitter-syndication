@@ -47,5 +47,7 @@ mod tests {
         assert_eq!(calc_token(1753365478318416281), "49cyp3d8ng");
         assert_eq!(calc_token(1727250580131750107), "46qbfs66quq");
         assert_eq!(calc_token(1757965341978956071), "49et726opy");
+        assert_eq!(calc_token(1811956533732999193), "4e4fgf1xne2");
+        assert_eq!(calc_token(1763509822736023570), "49w89fpzjmf");
     }
 }

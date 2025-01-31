@@ -32,9 +32,11 @@ impl TweetFetcher {
         static ENDPOINT: Lazy<Url> =
             Lazy::new(|| Url::parse("https://cdn.syndication.twimg.com/tweet-result").unwrap());
         let mut url = ENDPOINT.clone();
+        let token = calc_token(tweet_id);
+        eprintln!("TweetFetcher::fetch() id: {}, token: {}", tweet_id, &token);
         url.query_pairs_mut()
             .append_pair("id", &tweet_id.to_string())
-            .append_pair("token", &calc_token(tweet_id));
+            .append_pair("token", &token);
         let tweet: Tweet = self
             .client
             .get(url)
