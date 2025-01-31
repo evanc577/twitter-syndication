@@ -13,17 +13,8 @@ pub struct TweetFetcher {
 
 impl TweetFetcher {
     pub fn new() -> Result<Self, reqwest::Error> {
-        let mut headers = header::HeaderMap::new();
-        headers.insert(header::ACCEPT, header::HeaderValue::from_static("*/*"));
-        headers.insert(
-            header::USER_AGENT,
-            header::HeaderValue::from_static(
-                "Mozilla/5.0 (X11; Linux x86_64; rv:122.0) Gecko/20100101 Firefox/122.0",
-            ),
-        );
         let client = Client::builder()
             .timeout(Duration::from_secs(10))
-            .default_headers(headers)
             .build()?;
         Ok(Self { client })
     }
@@ -33,12 +24,24 @@ impl TweetFetcher {
             Lazy::new(|| Url::parse("https://cdn.syndication.twimg.com/tweet-result").unwrap());
         let mut url = ENDPOINT.clone();
         let token = calc_token(tweet_id);
+
         url.query_pairs_mut()
             .append_pair("id", &tweet_id.to_string())
             .append_pair("token", &token);
-        let tweet: Tweet = dbg!(self
+
+        let mut headers = header::HeaderMap::new();
+        headers.insert(header::ACCEPT, header::HeaderValue::from_static("*/*"));
+        headers.insert(
+            header::USER_AGENT,
+            header::HeaderValue::from_static(
+                "Mozilla/5.0 (X11; Linux x86_64; rv:122.0) Gecko/20100101 Firefox/122.0",
+            ),
+        );
+
+        let tweet: Tweet = self
             .client
-            .get(url))
+            .get(url)
+            .headers(headers)
             .send()
             .await?
             .error_for_status()?
