@@ -3,7 +3,7 @@ use serde::{Deserialize, Serialize};
 #[allow(clippy::large_enum_variant)]
 #[derive(Deserialize, Serialize, Clone, Hash, Debug)]
 #[serde(tag = "__typename")]
-pub(crate) enum TweetType {
+pub enum TweetType {
     Tweet(Tweet),
     TweetTombstone,
 }
